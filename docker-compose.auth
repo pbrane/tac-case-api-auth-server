@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+
+  authsvr:
+    container_name: tac-case-api-auth-server-prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    stdin_open: true
+    environment:
+      SERVER_PORT: 8080  # Explicitly set the server's listening port
+      SPRING_DATASOURCE_URL: jdbc:postgresql://authdb:5432/taccaseauth
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}  # Use $DB_USERNAME for consistency
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}  # Use $DB_PASSWORD for consistency
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      AUTH_SERVER_ISSUER: http://localhost:8080  # Set the issuer URI to match the port
+      AUTH_SVR_ENV: ${AUTH_SVR_ENV}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      CLIENT_NAME: ${CLIENT_NAME}
+    ports:
+      - "9080:8080"
+    networks:
+      - backend
+#    restart: unless-stopped
+    profiles:
+      - production
+
+  authsvr-dev:
+    container_name: tac-case-api-auth-server-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    stdin_open: true
+    environment:
+      SERVER_PORT: 8080  # Explicitly set the server's listening port
+      SPRING_DATASOURCE_URL: jdbc:postgresql://authdb-dev:5432/taccaseauth
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}  # Use $DB_USERNAME for consistency
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}  # Use $DB_PASSWORD for consistency
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      AUTH_SERVER_ISSUER: http://localhost:8080  # Set the issuer URI to match the port
+      AUTH_SVR_ENV: ${AUTH_SVR_ENV}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      CLIENT_NAME: ${CLIENT_NAME}
+    ports:
+      - "9081:8080"  # Different port for dev to avoid conflicts
+    networks:
+      - backend
+#    restart: unless-stopped
+    profiles:
+      - development
+
+networks:
+  backend:
+    driver: bridge
+
+#volumes:
+#  authdb_data:
+
