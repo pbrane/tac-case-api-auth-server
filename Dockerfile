@@ -19,7 +19,8 @@ RUN chmod +x mvnw
 RUN ./mvnw clean package -DskipTests -P container-build
 
 # Final image
-FROM openjdk:21-jdk-slim
+#FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jdk-noble
 WORKDIR /app
 COPY --from=builder /app/target/tac-case-api-auth-server-*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
