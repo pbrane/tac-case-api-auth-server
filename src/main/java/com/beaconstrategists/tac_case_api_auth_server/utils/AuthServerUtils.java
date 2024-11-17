@@ -24,20 +24,11 @@ import java.util.function.Consumer;
 @ShellComponent
 public class AuthServerUtils {
 
-    private static final String QUERY = "SELECT " +
-            "id, " +
-            "client_id, " +
-            "client_id_issued_at, " +
-            "client_secret, " +
-            "client_secret_expires_at, " +
-            "client_name, " +
-            "client_authentication_methods, " +
-            "authorization_grant_types, " +
-            "redirect_uris, " +
-            "post_logout_redirect_uris, " +
-            "scopes, client_settings, " +
-            "token_settings " +
-            "FROM oauth2_registered_client";
+    private static final String QUERY =
+            "  SELECT * " +
+            "    FROM oauth2_registered_client " +
+            "ORDER BY client_secret_expires_at ASC";
+
     private static final ClientAuthenticationMethod AUTHENTICATION_METHOD = ClientAuthenticationMethod.CLIENT_SECRET_BASIC;
     private static final AuthorizationGrantType GRANT_TYPE = AuthorizationGrantType.CLIENT_CREDENTIALS;
 
@@ -85,16 +76,17 @@ public class AuthServerUtils {
     @ShellMethod(value = "List all registered clients sorted by secret expiration date.", key = "list-clients")
     public String listClients() {
         List<RegisteredClient> clients = jdbcTemplate.query(QUERY, new JdbcRegisteredClientRepository.RegisteredClientRowMapper());
-        List<RegisteredClient> sortedClients = clients.stream()
-                .sorted((client1, client2) -> {
-                    Instant expiresAt1 = client1.getClientSecretExpiresAt();
-                    Instant expiresAt2 = client2.getClientSecretExpiresAt();
-                    if (expiresAt1 == null && expiresAt2 == null) return 0;
-                    if (expiresAt1 == null) return 1;
-                    if (expiresAt2 == null) return -1;
-                    return expiresAt1.compareTo(expiresAt2);
-                })
-                .toList();
+        List<RegisteredClient> sortedClients = clients;
+//        List<RegisteredClient> sortedClients = clients.stream()
+//                .sorted((client1, client2) -> {
+//                    Instant expiresAt1 = client1.getClientSecretExpiresAt();
+//                    Instant expiresAt2 = client2.getClientSecretExpiresAt();
+//                    if (expiresAt1 == null && expiresAt2 == null) return 0;
+//                    if (expiresAt1 == null) return 1;
+//                    if (expiresAt2 == null) return -1;
+//                    return expiresAt1.compareTo(expiresAt2);
+//                })
+//                .toList();
 
         StringBuilder result = new StringBuilder("\nRegistered Clients (sorted by client secret expiration date):\n");
         for (RegisteredClient client : sortedClients) {

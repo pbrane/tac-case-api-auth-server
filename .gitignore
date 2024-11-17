@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### Spring Goddies ###
-#**/tac-case-auth-server.log
+**/tac-case-auth-server.log

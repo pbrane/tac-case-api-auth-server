@@ -40,7 +40,6 @@ public class SecurityConfig {
 //        http
 //                .authorizeHttpRequests(authorize -> authorize
 //                        .requestMatchers("/.well-known/jwks.json").permitAll() // Allow public access
-//                        .anyRequest().authenticated() // Secure other endpoints
 //                );
 ////                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt); // Optional, if you use JWT tokens
 //        return http.build();
