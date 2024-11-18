@@ -1,16 +1,16 @@
 ## Configure the shell environment for dev
 ```bash
-. ./export_vars.sh ./dev-vars
+. ./dev-vars
 ```
 
 ## Configure the shell environment for prod
 ```bash
-. ./export_vars.sh ./prod-vars
+. ./prod-vars
 ```
 
 ## Configure the shell environment for console app
 ```bash
-. ./export_vars.sh ./console-vars
+. ./console-vars
 ```
 
 ## Build the container environment

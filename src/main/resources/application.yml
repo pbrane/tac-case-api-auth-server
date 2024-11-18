@@ -1,35 +1,11 @@
-#authsvr:
-#  env: ${AUTHSVR_ENV:dev}
-
-server:
-  port: 8080
-
+logging:
+  level:
+    org:
+      springframework:
+        security: trace
 spring:
   application:
     name: tac-case-auth-server
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/taccaseapi}
-    username: ${SPRING_DATASOURCE_USERNAME:tacapiuser}
-    password: ${SPRING_DATASOURCE_PASSWORD:tacapipass}
   shell:
     interactive:
       enabled: true
-#  security:
-#    oauth2:
-#      authorizationserver:
-#        client:
-#          online-shop:
-#            registration:
-#              client-id: "client-id"
-#              client-secret: "{noop}client-secret"
-#              client-authentication-methods:
-#                - "client_secret_basic"
-#              authorization-grant-types:
-#                - "client_credentials"
-#              scopes:
-#                - "read.cases"
-#                - "write.cases"
-#                - "read"
-#                - "write"
-#                - "read.write"

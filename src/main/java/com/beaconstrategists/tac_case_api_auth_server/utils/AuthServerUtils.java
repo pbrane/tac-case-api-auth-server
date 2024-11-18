@@ -2,7 +2,6 @@ package com.beaconstrategists.tac_case_api_auth_server.utils;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -33,6 +32,7 @@ public class AuthServerUtils {
     private static final AuthorizationGrantType GRANT_TYPE = AuthorizationGrantType.CLIENT_CREDENTIALS;
 
     //fixme: make this configurable
+    //fixme: there is a duplicate of this in Registered Client Repository
     private final Consumer<Set<String>> clientScopes = strings -> {
         strings.add("read.cases");
         strings.add("write.cases");
@@ -52,7 +52,7 @@ public class AuthServerUtils {
     public String registerOrUpdateClient(@ShellOption(value = "-i", defaultValue = "client-id", help = "Client ID") String clientId,
                                          @ShellOption(value = "-s", defaultValue = "client-secret", help = "Client Secret") String clientSecret,
                                          @ShellOption(value = "-n", defaultValue = "msft", help = "Client Name") String clientName){
-        RegisteredClient client = createOrUpdate(clientId, clientSecret, clientName, AUTHENTICATION_METHOD, GRANT_TYPE, clientScopes);
+        RegisteredClient client = createOrUpdate(clientId, clientSecret, clientName, clientScopes);
         registeredClientRepository.save(client);
         return String.format("Client: %s, registered. Expires: %s", client.getClientName(), client.getClientSecretExpiresAt());
     }
@@ -75,18 +75,8 @@ public class AuthServerUtils {
     //fixme: this should be improved to support dev's inmemory repository
     @ShellMethod(value = "List all registered clients sorted by secret expiration date.", key = "list-clients")
     public String listClients() {
-        List<RegisteredClient> clients = jdbcTemplate.query(QUERY, new JdbcRegisteredClientRepository.RegisteredClientRowMapper());
-        List<RegisteredClient> sortedClients = clients;
-//        List<RegisteredClient> sortedClients = clients.stream()
-//                .sorted((client1, client2) -> {
-//                    Instant expiresAt1 = client1.getClientSecretExpiresAt();
-//                    Instant expiresAt2 = client2.getClientSecretExpiresAt();
-//                    if (expiresAt1 == null && expiresAt2 == null) return 0;
-//                    if (expiresAt1 == null) return 1;
-//                    if (expiresAt2 == null) return -1;
-//                    return expiresAt1.compareTo(expiresAt2);
-//                })
-//                .toList();
+        List<RegisteredClient> sortedClients = jdbcTemplate.query(QUERY, new JdbcRegisteredClientRepository.RegisteredClientRowMapper());
+//        List<RegisteredClient> sortedClients = getRegisteredClients(clients);
 
         StringBuilder result = new StringBuilder("\nRegistered Clients (sorted by client secret expiration date):\n");
         for (RegisteredClient client : sortedClients) {
@@ -99,29 +89,28 @@ public class AuthServerUtils {
         return result.toString();
     }
 
-    //fixme: Left off here. This method needs attention and normalized with register method in the Bean's config class
-    private RegisteredClient createOrUpdate(String clientId, String clientSecret, String clientName, ClientAuthenticationMethod clientAuthenticationMethod,
-                                           AuthorizationGrantType grantType,
-                                           Consumer<Set<String>> scopes) {
+    private static List<RegisteredClient> getRegisteredClients(List<RegisteredClient> clients) {
+        return
+                clients.stream()
+                .sorted((client1, client2) -> {
+                    Instant expiresAt1 = client1.getClientSecretExpiresAt();
+                    Instant expiresAt2 = client2.getClientSecretExpiresAt();
+                    if (expiresAt1 == null && expiresAt2 == null) return 0;
+                    if (expiresAt1 == null) return 1;
+                    if (expiresAt2 == null) return -1;
+                    return expiresAt1.compareTo(expiresAt2);
+                })
+                .toList();
+    }
 
-        RegisteredClient client = registeredClientRepository.findByClientId(clientId);
+    private RegisteredClient createOrUpdate(String clientId, String clientSecret, String clientName,
+                                            Consumer<Set<String>> scopes) {
 
-        if (client == null) {
-
-            if (scopes != null) {
-                scopes = clientScopes;
-            }
-
-            client = createRegisteredClient(clientId, clientSecret, clientName, clientAuthenticationMethod, grantType, scopes);
-
-        } else {
-            client = RegisteredClient.from(client)
-//                    .clientSecret(passwordEncoder.encode(clientSecret))
-                    .clientSecret("{noop}"+clientSecret)
-                    .clientSecretExpiresAt(Instant.now().plus(Duration.ofDays(30)))
-                    .build();
-        }
-
+        /*
+        The save method in the repository checks for exiting client and updates
+        so we don't need to check here.
+         */
+        RegisteredClient client = createRegisteredClient(clientId, clientSecret, clientName, AuthServerUtils.AUTHENTICATION_METHOD, AuthServerUtils.GRANT_TYPE, scopes);
         registeredClientRepository.save(client);
         return client;
     }
@@ -136,7 +125,7 @@ public class AuthServerUtils {
         //fixme: should probably throw exception if any of these are null and/or we should provide defaults where possible
         return RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId(clientId)
-                .clientSecret("{noop}"+clientSecret)
+                .clientSecret(clientSecret)
 //                .clientSecret(passwordEncoder.encode(clientSecret))
                 .clientName(clientName)
                 .clientAuthenticationMethod(clientAuthenticationMethod)

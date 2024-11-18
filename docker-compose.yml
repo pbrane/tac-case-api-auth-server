@@ -63,7 +63,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}  # Use $DB_USERNAME for consistency
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}  # Use $DB_PASSWORD for consistency
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      AUTH_SERVER_ISSUER: http://localhost:8080  # Set the issuer URI to match the port
+      AUTH_SERVER_ISSUER: http://localhost:9080  # Set the issuer URI to match the port
       AUTH_SVR_ENV: ${AUTH_SVR_ENV}
       CLIENT_ID: ${CLIENT_ID}
       CLIENT_SECRET: ${CLIENT_SECRET}
@@ -92,15 +92,15 @@ services:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}  # Use $DB_USERNAME for consistency
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}  # Use $DB_PASSWORD for consistency
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      AUTH_SERVER_ISSUER: http://localhost:8080  # Set the issuer URI to match the port
+      AUTH_SERVER_ISSUER: http://localhost:9081
       AUTH_SVR_ENV: ${AUTH_SVR_ENV}
       CLIENT_ID: ${CLIENT_ID}
       CLIENT_SECRET: ${CLIENT_SECRET}
       CLIENT_NAME: ${CLIENT_NAME}
     ports:
-      - "9081:8080"  # Different port for dev to avoid conflicts
+      - "9081:8080"
     depends_on:
-      authdb-dev:  # Reference the dev database
+      authdb-dev: 
         condition: service_healthy
     networks:
       - backend

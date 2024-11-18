@@ -20,6 +20,8 @@ import java.util.function.Consumer;
 @Configuration
 public class RegisteredClientRepositoryConfig {
 
+    //fixme: should we find a way to make these configurable???
+    //fixme: there is a duplicate definition of this in AuthServerUtils
     private final Consumer<Set<String>> clientScopes = strings -> {
         strings.add("read.cases");
         strings.add("write.cases");
@@ -28,7 +30,7 @@ public class RegisteredClientRepositoryConfig {
     @Value("${CLIENT_ID:client-id}")
     private String clientId;
 
-    @Value("${CLIENT_SECRET:{noop}client-secret}")
+    @Value("${CLIENT_SECRET:client-secret}")
     private String clientSecret;
 
     @Value("${CLIENT_NAME:client-name}")

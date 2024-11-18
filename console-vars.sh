@@ -1,0 +1,13 @@
+export SERVER_PORT=9000
+export AUTH_SVR_ENV=development
+export POSTGRES_USER=tacauthuser
+export POSTGRES_PASSWORD=tacauthpass
+export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:6433/taccaseauth
+export SPRING_DATASOURCE_USERNAME=$POSTGRES_USER
+export SPRING_DATASOURCE_PASSWORD=$POSTGRES_PASSWORD
+export SPRING_JPA_HIBERNATE_DDL_AUTO=update
+export CLIENT_ID=client-id
+export CLIENT_SECRET=client-secret
+export CLIENT_NAME=client-name
+export AUTH_SERVER_ISSUER=http://localhost:$SERVER_PORT
+export TERM=xterm

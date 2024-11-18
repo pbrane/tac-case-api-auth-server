@@ -1,15 +1,19 @@
 package com.beaconstrategists.tac_case_api_auth_server.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.server.ConfigurableWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 
 @Configuration
 public class AuthorizationServerConfig {
 
-    private final RegisteredClientRepository registeredClientRepository;
+    @Value("${SERVER_PORT:9000}")
+    private int serverPort;
 
-    public AuthorizationServerConfig(RegisteredClientRepository registeredClientRepository) {
-        this.registeredClientRepository = registeredClientRepository;
+    @Bean
+    public WebServerFactoryCustomizer<ConfigurableWebServerFactory> webServerFactoryCustomizer() {
+        return factory -> factory.setPort(serverPort);
     }
-
 }
