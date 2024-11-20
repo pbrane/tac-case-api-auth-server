@@ -10,13 +10,13 @@ import javax.sql.DataSource;
 @Configuration
 public class DataSourceConfig {
 
-    @Value("${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/taccaseapi}")
+    @Value("${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/tacauthdb}")
     private String datasourceUrl;
 
-    @Value("${SPRING_DATASOURCE_USERNAME:tacapiuser}")
+    @Value("${SPRING_DATASOURCE_USERNAME:tacauthuser}")
     private String datasourceUsername;
 
-    @Value("${SPRING_DATASOURCE_PASSWORD:tacapipass}")
+    @Value("${SPRING_DATASOURCE_PASSWORD:tacauthpass}")
     private String datasourcePassword;
 
     @Bean

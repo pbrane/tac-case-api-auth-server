@@ -19,9 +19,13 @@ RUN chmod +x mvnw
 RUN ./mvnw clean package -DskipTests -P container-build
 
 # Final image
-#FROM openjdk:21-jdk-slim
 FROM eclipse-temurin:21-jdk-noble
+
+# Install reptyr and clean up apt cache
+RUN apt-get update && apt install -y reptyr && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-COPY --from=builder /app/target/tac-case-api-auth-server-*.jar app.jar
+#The Maven container-build profile sets the final name of the JAR to "app.jar"
+COPY --from=builder /app/target/app.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
 

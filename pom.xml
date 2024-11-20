@@ -64,6 +64,7 @@
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<build>
+				<finalName>app</finalName>
 				<plugins>
 					<plugin>
 						<groupId>org.springframework.boot</groupId>
@@ -90,7 +91,7 @@
 		<profile>
 			<id>spring-boot-profile</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<activeByDefault>false</activeByDefault>
 			</activation>
 			<build>
 				<plugins>

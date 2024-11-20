@@ -34,3 +34,5 @@ build/
 
 ### Spring Goddies ###
 **/tac-case-auth-server.log
+
+**/.DS_Store
