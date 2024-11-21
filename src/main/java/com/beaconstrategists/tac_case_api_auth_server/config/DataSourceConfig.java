@@ -1,6 +1,7 @@
 package com.beaconstrategists.tac_case_api_auth_server.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -20,6 +21,7 @@ public class DataSourceConfig {
     private String datasourcePassword;
 
     @Bean
+    @ConditionalOnProperty(name = "AUTH_SVR_ENV", havingValue = "production", matchIfMissing = false)
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
