@@ -36,7 +36,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=tacauthpass
       - AUTH_SVR_ENV=production
     build:
-      context: ./tac-case-api-auth-server
+      context: .
       dockerfile: Dockerfile
     tty: true
     stdin_open: true
@@ -64,7 +64,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=tacauthpass
       - AUTH_SVR_ENV=development
     build:
-      context: ./tac-case-api-auth-server
+      context: .
       dockerfile: Dockerfile
     tty: true
     stdin_open: true
