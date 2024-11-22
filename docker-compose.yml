@@ -1,23 +1,20 @@
-version: '3.8'
-
 services:
-  authdb:
-    container_name: postgres-prod
+  authdb-prod:
+    container_name: authdb-prod
     image: postgres:17
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      PGDATA: /authdb/data/postgres
-      POSTGRES_DB: taccaseauth
-      AUTH_SVR_ENV: production
+      - POSTGRES_USER=tacauthuser
+      - POSTGRES_PASSWORD=tacauthpass
+      - POSTGRES_DB=tacauthdb
+      - PGDATA=/authdb-prod/data/postgres
     volumes:
-      - authdb_data:/var/docker/taccaseauth
+      - authdb_data:/var/docker/taccaseapi
       - ./db_init:/docker-entrypoint-initdb.d
     ports:
-      - "6432:5432"
+      - 6432:5432
     networks:
       - backend
-#    restart: unless-stopped
+    #    restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -d postgres" ]
       interval: 10s
@@ -26,52 +23,27 @@ services:
     profiles:
       - production
 
-  authdb-dev:
-    container_name: postgres-dev
-    image: postgres:17
+  authsvr-prod:
+    container_name: authsvr-prod
+    image: pbranestrategy/tac-case-api-auth-server:0.1.3
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      PGDATA: /authdb-dev/data/postgres
-      POSTGRES_DB: taccaseauth
-    volumes:
-      - /dev/null:/var/docker/data/taccaseauth_dev
-      - ./db_init:/docker-entrypoint-initdb.d
-    ports:
-      - "6433:5432"  # Different port for dev to avoid conflicts
-    networks:
-      - backend
-#    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -d postgres" ]
-      interval: 10s
-      timeout: 3s
-      retries: 3
-    profiles:
-      - development
-
-  authsvr:
-    container_name: tac-case-api-auth-server-prod
+      - CLIENT_ID=client-id
+      - CLIENT_SECRET=client-secret
+      - CLIENT_NAME=client-name
+      - SERVER_PORT=8080
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://authdb-prod:5432/tacauthdb
+      - SPRING_DATASOURCE_USERNAME=tacauthuser
+      - SPRING_DATASOURCE_PASSWORD=tacauthpass
+      - AUTH_SVR_ENV=production
     build:
-      context: .
+      context: ./tac-case-api-auth-server
       dockerfile: Dockerfile
     tty: true
     stdin_open: true
-    environment:
-      SERVER_PORT: 8080  # Explicitly set the server's listening port
-      SPRING_DATASOURCE_URL: jdbc:postgresql://authdb:5432/taccaseauth
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}  # Use $DB_USERNAME for consistency
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}  # Use $DB_PASSWORD for consistency
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      AUTH_SERVER_ISSUER: http://localhost:9080  # Set the issuer URI to match the port
-      AUTH_SVR_ENV: ${AUTH_SVR_ENV}
-      CLIENT_ID: ${CLIENT_ID}
-      CLIENT_SECRET: ${CLIENT_SECRET}
-      CLIENT_NAME: ${CLIENT_NAME}
     ports:
-      - "9080:8080"
+      - 9080:8080
     depends_on:
-      authdb:
+      authdb-prod:
         condition: service_healthy
     networks:
       - backend
@@ -80,28 +52,27 @@ services:
       - production
 
   authsvr-dev:
-    container_name: tac-case-api-auth-server-dev
+    container_name: authsvr-dev
+    image: pbranestrategy/tac-case-api-auth-server:0.1.3
+    environment:
+      - CLIENT_ID=client-id
+      - CLIENT_SECRET=client-secret
+      - CLIENT_NAME=client-name
+      - SERVER_PORT=8080
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://authdb-dev:5432/tacauthdb
+      - SPRING_DATASOURCE_USERNAME=tacauthuser
+      - SPRING_DATASOURCE_PASSWORD=tacauthpass
+      - AUTH_SVR_ENV=development
     build:
-      context: .
+      context: ./tac-case-api-auth-server
       dockerfile: Dockerfile
     tty: true
     stdin_open: true
-    environment:
-      SERVER_PORT: 8080  # Explicitly set the server's listening port
-      SPRING_DATASOURCE_URL: jdbc:postgresql://authdb-dev:5432/taccaseauth
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}  # Use $DB_USERNAME for consistency
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}  # Use $DB_PASSWORD for consistency
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      AUTH_SERVER_ISSUER: http://localhost:9081
-      AUTH_SVR_ENV: ${AUTH_SVR_ENV}
-      CLIENT_ID: ${CLIENT_ID}
-      CLIENT_SECRET: ${CLIENT_SECRET}
-      CLIENT_NAME: ${CLIENT_NAME}
     ports:
-      - "9081:8080"
-    depends_on:
-      authdb-dev: 
-        condition: service_healthy
+      - 9080:8080
+#    depends_on:
+#      authdb-dev:
+#        condition: service_healthy
     networks:
       - backend
 #    restart: unless-stopped
