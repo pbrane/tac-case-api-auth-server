@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AuthorizationServerConfig {
 
-    @Value("${SERVER_PORT:9000}")
+    @Value("${SERVER_PORT:8080}")
     private int serverPort;
 
     @Bean
