@@ -22,10 +22,11 @@ RUN ./mvnw clean package -DskipTests -P container-build
 FROM eclipse-temurin:21-jdk-noble
 
 # Install handy utilites and clean up apt cache
-RUN apt-get update && apt-get install -y reptyr dnsutils bind9-utils net-tools iproute2 iputils-ping iputils-tracepath ncat && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y reptyr dnsutils bind9-utils net-tools iproute2 iputils-ping iputils-tracepath ncat screen && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 #The Maven container-build profile sets the final name of the JAR to "app.jar"
 COPY --from=builder /app/target/app.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+#ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["/bin/bash", "-c", "java -jar app.jar"]
 
